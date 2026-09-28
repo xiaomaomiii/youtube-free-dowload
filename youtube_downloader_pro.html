@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-slate-950 text-slate-100 font-sans antialiased selection:bg-red-500 selection:text-white flex flex-col justify-between">
+
+    <header class="w-full border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 to-rose-500 flex items-center justify-center shadow-lg shadow-red-600/30">
+                    <i class="fa-solid fa-play text-white text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">YTSaver</span>
+                    <span class="text-xs uppercase px-1.5 py-0.5 ml-1 bg-red-500/10 text-red-400 border border-red-500/20 font-bold rounded">Pro</span>
+                </div>
+            </div>
+            <div class="hidden sm:flex items-center space-x-6 text-sm font-medium text-slate-400">
+                <a href="#features" class="hover:text-white transition">Características</a>
+                <span class="flex items-center text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping mr-1.5"></span> Servidor Local
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center px-4 py-12">
+        <div class="max-w-3xl w-full mx-auto text-center space-y-8">
+            
+            <div class="space-y-3">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-300 shadow-inner">
+                    <i class="fa-solid fa-bolt text-amber-400"></i> Motor de análisis ultra rápido HD / 4K
+                </div>
+                <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                    Descargador de <span class="bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 bg-clip-text text-transparent">YouTube</span>
+                </h1>
+                <p class="text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
+                    Pega el enlace de cualquier video de YouTube y descárgalo instantáneamente en MP4 o extrae su audio en MP3.
+                </p>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800/80 p-4 sm:p-6 rounded-3xl shadow-2xl backdrop-blur-xl relative overflow-hidden">
+                <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <form id="downloadForm" onsubmit="handleAnalyze(event)" class="relative z-10 flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-grow">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                            <i class="fa-solid fa-link"></i>
+                        </div>
+                        <input type="text" id="urlInput" required
+                            placeholder="Pega el enlace aquí (ej. https://www.youtube.com/watch?v=...)"
+                            class="w-full pl-11 pr-4 py-3.5 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition text-sm sm:text-base">
+                    </div>
+                    <button type="submit" id="analyzeBtn"
+                        class="px-6 py-3.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-semibold rounded-2xl shadow-lg shadow-red-600/30 transition duration-200 flex items-center justify-center space-x-2 shrink-0 cursor-pointer">
+                        <span>Analizar</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </form>
+
+                <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
+                    <span class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> Sin publicidad intrusiva</span>
+                    <span class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> Descarga directa local</span>
+                    <span class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i> Alta velocidad</span>
+                </div>
+            </div>
+
+            <div id="loadingCard" class="hidden text-center py-12 space-y-4 bg-slate-900/50 border border-slate-800/80 rounded-3xl">
+                <div class="relative w-16 h-16 mx-auto">
+                    <div class="absolute inset-0 rounded-full border-4 border-red-500/20"></div>
+                    <div class="absolute inset-0 rounded-full border-4 border-red-500 border-t-transparent animate-spin"></div>
+                </div>
+                <div class="space-y-1">
+                    <h4 class="font-bold text-white text-lg">Obteniendo información del video...</h4>
+                    <p class="text-xs text-slate-400">Extrayendo título, canal y miniatura reales</p>
+                </div>
+            </div>
+
+            <div id="resultContainer" class="hidden text-left bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl space-y-6">
+                
+                <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start border-b border-slate-800 pb-5">
+                    <div class="relative w-full sm:w-48 aspect-video sm:aspect-[16/10] bg-slate-950 rounded-xl overflow-hidden shrink-0 border border-slate-800">
+                        <img id="videoThumb" src="" alt="Miniatura" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+                        <span id="videoDuration" class="hidden absolute bottom-2 right-2 bg-black/80 backdrop-blur-md text-[10px] font-bold px-2 py-0.5 rounded text-white"></span>
+                    </div>
+                    <div class="flex-grow space-y-2 text-center sm:text-left">
+                        <h3 id="videoTitle" class="font-bold text-white text-base sm:text-lg line-clamp-2">Título del video analizado</h3>
+                        <p id="videoChannel" class="text-xs text-slate-400 font-medium flex items-center justify-center sm:justify-start gap-1.5">
+                            <i class="fa-solid fa-circle-user text-slate-500"></i> Canal Verificado
+                        </p>
+                        <div class="flex flex-wrap justify-center sm:justify-start gap-2 pt-1">
+                            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium"><i class="fa-solid fa-shield-halved mr-1"></i> Enlace Seguro</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-download text-red-500"></i> Selecciona la Calidad
+                        </h4>
+                    </div>
+
+                    <div class="flex border-b border-slate-800 text-sm font-semibold">
+                        <button onclick="switchTab('video')" id="tabVideo" class="pb-2.5 px-4 text-red-500 border-b-2 border-red-500 transition flex items-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-video"></i> Video (MP4)
+                        </button>
+                        <button onclick="switchTab('audio')" id="tabAudio" class="pb-2.5 px-4 text-slate-400 hover:text-white transition flex items-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-music"></i> Audio (MP3)
+                        </button>
+                    </div>
+
+                    <div id="videoFormats" class="space-y-2.5">
+                        <div class="flex items-center justify-between p-3.5 bg-slate-950/60 border border-slate-800 rounded-xl hover:border-slate-700 transition">
+                            <div class="flex items-center gap-3">
+                                <span class="w-10 h-10 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center font-bold text-xs">1080p</span>
+                                <div>
+                                    <h5 class="font-bold text-sm text-white">MP4 Full HD</h5>
+                                    <p class="text-[11px] text-slate-400">Alta Definición con audio estéreo</p>
+                                </div>
+                            </div>
+                            <button onclick="triggerDownload('mp4','1080')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-semibold text-xs rounded-lg transition shadow-md shadow-red-600/20 flex items-center gap-1.5 cursor-pointer">
+                                <i class="fa-solid fa-download"></i> Descargar
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between p-3.5 bg-slate-950/60 border border-slate-800 rounded-xl hover:border-slate-700 transition">
+                            <div class="flex items-center gap-3">
+                                <span class="w-10 h-10 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-xs">720p</span>
+                                <div>
+                                    <h5 class="font-bold text-sm text-white">MP4 HD</h5>
+                                    <p class="text-[11px] text-slate-400">Calidad estándar equilibrada</p>
+                                </div>
+                            </div>
+                            <button onclick="triggerDownload('mp4','720')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                                <i class="fa-solid fa-download"></i> Descargar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="audioFormats" class="space-y-2.5 hidden">
+                        <div class="flex items-center justify-between p-3.5 bg-slate-950/60 border border-slate-800 rounded-xl hover:border-slate-700 transition">
+                            <div class="flex items-center gap-3">
+                                <span class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-xs">MP3</span>
+                                <div>
+                                    <h5 class="font-bold text-sm text-white">Audio MP3 (320kbps)</h5>
+                                    <p class="text-[11px] text-slate-400">Máxima fidelidad sonora</p>
+                                </div>
+                            </div>
+                            <button onclick="triggerDownload('mp3','320')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg transition shadow-md shadow-emerald-600/20 flex items-center gap-1.5 cursor-pointer">
+                                <i class="fa-solid fa-download"></i> Descargar
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 flex items-center gap-1.5"><i class="fa-solid fa-circle-info"></i> El servidor procesa y descarga el video real. Puede tardar unos segundos en la barra de descargas de tu navegador.</p>
+                </div>
+            </div>
+
+            <div id="features" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left">
+                <div class="bg-slate-900/40 border border-slate-800/60 p-5 rounded-2xl space-y-2">
+                    <div class="w-10 h-10 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm">Ultra Rápido</h3>
+                    <p class="text-xs text-slate-400">Procesamiento inmediato al pegar cualquier enlace de YouTube.</p>
+                </div>
+                <div class="bg-slate-900/40 border border-slate-800/60 p-5 rounded-2xl space-y-2">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm">Múltiples Formatos</h3>
+                    <p class="text-xs text-slate-400">Elige calidad en video HD o convierte directamente a audio MP3.</p>
+                </div>
+                <div class="bg-slate-900/40 border border-slate-800/60 p-5 rounded-2xl space-y-2">
+                    <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-mobile-screen"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm">Compatible Móvil</h3>
+                    <p class="text-xs text-slate-400">Funciona fluidamente en smartphones, tablets y ordenadores.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="notificationModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
+            <div id="modalIcon" class="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 id="modalTitle" class="font-bold text-white text-base">¡Operación Exitosa!</h3>
+                <p id="modalMessage" class="text-xs text-slate-400">El archivo se está procesando.</p>
+            </div>
+            
+            <div id="downloadProgressBarContainer" class="hidden w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800 mt-2">
+                <div id="downloadProgressBar" class="bg-gradient-to-r from-red-600 to-emerald-500 h-2.5 rounded-full w-0 transition-all duration-300"></div>
+            </div>
+            <span id="progressText" class="text-[11px] text-slate-400 hidden block mt-1">Preparando...</span>
+
+            <div id="actionButtonContainer" class="mt-2">
+                <button id="modalActionBtn" onclick="closeModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl text-sm transition cursor-pointer">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="border-t border-slate-800/80 bg-slate-900/30 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>&copy; 2026 YouTube Downloader Pro. Herramienta web optimizada.</p>
+            <div class="flex space-x-6">
+                <span class="hover:text-slate-300 transition">Privacidad</span>
+                <span class="hover:text-slate-300 transition">Soporte</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== Backend local (server.py) =====
+        // Toda la descarga/metadata se hace en el propio servidor con yt-dlp,
+        // por lo que la web y la API son MISMO ORIGEN (sin CORS, sin servicios externos).
+        let currentVideoUrl = null;
+        let currentVideoId = null;
+
+        function showNotification(title, message, isError = false, showProgress = false) {
+            const modal = document.getElementById('notificationModal');
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+
+            const progressContainer = document.getElementById('downloadProgressBarContainer');
+            const progressText = document.getElementById('progressText');
+            const actionBtn = document.getElementById('modalActionBtn');
+            const modalIcon = document.getElementById('modalIcon');
+
+            if (isError) {
+                modalIcon.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl bg-red-500/10 text-red-400 border border-red-500/20";
+                modalIcon.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+                progressContainer.classList.add('hidden');
+                progressText.classList.add('hidden');
+                actionBtn.classList.remove('hidden');
+                actionBtn.textContent = 'Entendido';
+            } else if (showProgress) {
+                modalIcon.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl bg-red-500/10 text-red-400 border border-red-500/20";
+                modalIcon.innerHTML = '<i class="fa-solid fa-download fa-bounce"></i>';
+                progressContainer.classList.remove('hidden');
+                document.getElementById('downloadProgressBar').style.width = '0%';
+                progressText.classList.remove('hidden');
+                progressText.textContent = "Conectando con el servidor...";
+                actionBtn.classList.add('hidden');
+            } else {
+                modalIcon.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                modalIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                progressContainer.classList.add('hidden');
+                progressText.classList.add('hidden');
+                actionBtn.classList.remove('hidden');
+                actionBtn.textContent = 'Cerrar';
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function setStatusText(text) {
+            const el = document.getElementById('progressText');
+            el.textContent = text;
+            el.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('notificationModal').classList.add('hidden');
+        }
+
+        function switchTab(type) {
+            const tabVideo = document.getElementById('tabVideo');
+            const tabAudio = document.getElementById('tabAudio');
+            const videoFormats = document.getElementById('videoFormats');
+            const audioFormats = document.getElementById('audioFormats');
+            const active = "pb-2.5 px-4 text-red-500 border-b-2 border-red-500 transition flex items-center gap-2 cursor-pointer";
+            const inactive = "pb-2.5 px-4 text-slate-400 hover:text-white transition flex items-center gap-2 cursor-pointer";
+
+            if (type === 'video') {
+                tabVideo.className = active;
+                tabAudio.className = inactive;
+                videoFormats.classList.remove('hidden');
+                audioFormats.classList.add('hidden');
+            } else {
+                tabAudio.className = active;
+                tabVideo.className = inactive;
+                audioFormats.classList.remove('hidden');
+                videoFormats.classList.add('hidden');
+            }
+        }
+
+        function extractVideoID(url) {
+            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            let match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function fmtDuration(sec) {
+            sec = parseInt(sec || 0, 10);
+            const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+            const pad = n => String(n).padStart(2, '0');
+            return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+        }
+
+        function setThumb(id) {
+            const img = document.getElementById('videoThumb');
+            img.onerror = function () { this.src = `https://i.ytimg.com/vi/${id}/default.jpg`; };
+            img.src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+        }
+
+        // ===== Analizar: metadatos REALES vía backend local (/api/metadata) =====
+        async function handleAnalyze(e) {
+            e.preventDefault();
+            const url = document.getElementById('urlInput').value.trim();
+
+            if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+                showNotification('Enlace inválido', 'Por favor ingresa un enlace válido de YouTube (ej: https://www.youtube.com/watch?v=dQw4w9WgXcQ)', true);
+                return;
+            }
+
+            currentVideoUrl = url;
+            currentVideoId = extractVideoID(url);
+
+            document.getElementById('resultContainer').classList.add('hidden');
+            document.getElementById('loadingCard').classList.remove('hidden');
+
+            if (currentVideoId) setThumb(currentVideoId);
+
+            try {
+                const res = await fetch('/api/metadata', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+                const data = await res.json();
+
+                document.getElementById('loadingCard').classList.add('hidden');
+
+                if (data.error) {
+                    document.getElementById('videoTitle').textContent = currentVideoId ? 'Video de YouTube' : 'Video';
+                    document.getElementById('videoChannel').innerHTML = '<i class="fa-solid fa-circle-user text-slate-500"></i> Canal de YouTube';
+                    document.getElementById('videoDuration').classList.add('hidden');
+                } else {
+                    document.getElementById('videoTitle').textContent = data.title || 'Video de YouTube';
+                    document.getElementById('videoChannel').innerHTML =
+                        `<i class="fa-solid fa-circle-user text-slate-500"></i> ${data.uploader || 'Canal de YouTube'}`;
+                    const durEl = document.getElementById('videoDuration');
+                    if (data.duration) { durEl.textContent = fmtDuration(data.duration); durEl.classList.remove('hidden'); }
+                    else durEl.classList.add('hidden');
+                    if (data.thumbnail && !currentVideoId) {
+                        document.getElementById('videoThumb').src = data.thumbnail;
+                    }
+                }
+
+                document.getElementById('resultContainer').classList.remove('hidden');
+                document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } catch (err) {
+                document.getElementById('loadingCard').classList.add('hidden');
+                document.getElementById('videoTitle').textContent = 'Video de YouTube';
+                document.getElementById('videoChannel').innerHTML = '<i class="fa-solid fa-circle-user text-slate-500"></i> Canal de YouTube';
+                document.getElementById('videoDuration').classList.add('hidden');
+                document.getElementById('resultContainer').classList.remove('hidden');
+            }
+        }
+
+        // ===== Descarga REAL vía backend local (/api/download) =====
+        // El backend usa yt-dlp y devuelve el archivo COMPLETO con
+        // Content-Disposition: attachment. Mismo origen => sin CORS ni blobs vacíos.
+        function triggerDownload(format, quality) {
+            if (!currentVideoUrl) {
+                showNotification('Sin video', 'Primero pega un enlace y pulsa Analizar.', true);
+                return;
+            }
+
+            showNotification(
+                'Procesando descarga...',
+                format === 'mp3' ? `Convirtiendo a MP3 (${quality}kbps)` : `Preparando MP4 (${quality}p)`,
+                false, true
+            );
+            setStatusText('El servidor está descargando el video real...');
+
+            const u = '/api/download?url=' + encodeURIComponent(currentVideoUrl) +
+                      '&fmt=' + encodeURIComponent(format) +
+                      '&q=' + encodeURIComponent(quality);
+
+            // Navegación en la MISMA pestaña: el backend responde con
+            // Content-Disposition: attachment, así el navegador descarga el
+            // archivo completo y la página se mantiene visible.
+            window.location.href = u;
+
+            setTimeout(() => {
+                const modalIcon = document.getElementById('modalIcon');
+                modalIcon.className = "w-12 h-12 rounded-full mx-auto flex items-center justify-center text-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                modalIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                document.getElementById('modalTitle').textContent = '¡Descarga iniciada!';
+                document.getElementById('modalMessage').textContent =
+                    'El servidor está generando el archivo. Aparecerá en la barra de descargas de tu navegador.';
+                document.getElementById('downloadProgressBarContainer').classList.add('hidden');
+                document.getElementById('progressText').classList.add('hidden');
+                const actionBtn = document.getElementById('modalActionBtn');
+                actionBtn.classList.remove('hidden');
+                actionBtn.textContent = 'Cerrar';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
